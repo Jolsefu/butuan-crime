@@ -141,8 +141,8 @@ export default function App() {
 
       axios
       .get(`${backend_url}/barangay_crime/${barangay}/${crime}`)
-      .then(response => {
-        setBarangayCrimeData(response.data);
+      .then(first_response => {
+        setBarangayCrimeData(first_response.data);
 
         axios
         .get(`${backend_url}/crime/${crime}`)
@@ -150,9 +150,6 @@ export default function App() {
           setCrimeData(response.data);
 
           barangayViewer(barangay);
-          crimeVisualizer(crimeData);
-
-          setTimeout(() => clearHeatMap(), 500);
         })
         .catch(error => {
           console.log(error);
@@ -525,6 +522,8 @@ function DataVisualizer(props) {
   useEffect(() => {
     hardClearHeatMap();
     clearHeatMap();
+
+    console.log(props.dataType)
   }, [props.dataType])
 
   // Display a data visualizer for barangay data
@@ -620,8 +619,6 @@ function DataVisualizer(props) {
         const crimeData = response.data.yearly[year]
         crimeData.yearly_totals = response.data.yearly_totals
         crimeData.crime = response.data.crime
-
-        console.log(crimeVisualizer)
 
         crimeVisualizer(crimeData);
       })
@@ -785,6 +782,8 @@ function DataVisualizer(props) {
         </div>
       )
     }
+
+    clearHeatMap();
 
     function updateChart(year) {
       // Set the current year chosen in the dropdown
