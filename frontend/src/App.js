@@ -225,7 +225,9 @@ export default function App() {
    */
   useEffect(() => {
     if (Object.keys(crimeData).length) {
-      setDataType('crime');
+      if (!(barangay.length > 1)) {
+        setDataType('crime');
+      }
     }
   }, [crimeData]);
 
@@ -517,12 +519,17 @@ function DataVisualizer(props) {
     setBColors([]);
     setBData([]);
     setBIsLatest(false);
+    clearHeatMap();
   }, [props.barangay, props.crime]);
+
+  useEffect(() => {
+    hardClearHeatMap();
+  }, [props.dataType])
 
   // Display a data visualizer for barangay data
   if (props.dataType === 'barangay') {
 
-    function updateChart(year) {
+    function updateBChart(year) {
       // Set the current year chosen in the dropdown
       setBYear(year);
 
@@ -549,7 +556,7 @@ function DataVisualizer(props) {
 
     // Dropdown handler of barangay crime data visualizer
     const handleChartDropdownChange = (event) => {
-      return updateChart(event.target.value)
+      return updateBChart(event.target.value)
     }
 
     // Set a years variable
@@ -571,7 +578,7 @@ function DataVisualizer(props) {
 
     if (!bIsLatest) {
       setTimeout(() => {
-        updateChart(years[0]);
+        updateBChart(years[0]);
         setBIsLatest(true);
       }, 500)
     }
@@ -600,7 +607,7 @@ function DataVisualizer(props) {
       return null;
     }
 
-    function updateChart(year) {
+    function updateCChart(year) {
       // Set the current year chosen in the dropdown
       setCYear(year);
       // Set the current max of Y axis for the graph
@@ -612,6 +619,8 @@ function DataVisualizer(props) {
         const crimeData = response.data.yearly[year]
         crimeData.yearly_totals = response.data.yearly_totals
         crimeData.crime = response.data.crime
+
+        console.log(crimeVisualizer)
 
         crimeVisualizer(crimeData);
       })
@@ -678,7 +687,11 @@ function DataVisualizer(props) {
 
     // Dropdown handler of barangay crime data visualizer
     const handleChartDropdownChange = (event) => {
-      return updateChart(event.target.value)
+      if (!event.target.value) {
+        clearHeatMap();
+      }
+
+      return updateCChart(event.target.value)
     }
 
     // Set a years variable
@@ -730,7 +743,7 @@ function DataVisualizer(props) {
 
     if (!cIsLatest) {
       setTimeout(() => {
-        updateChart(years[0]);
+        updateCChart(years[0]);
         setCIsLatest(true);
       }, 500)
     }
@@ -1040,12 +1053,20 @@ function BarChart({ chartData, text }) {
   );
 }
 
+function hardClearHeatMap() {
+  document.querySelectorAll('#paths-container > path').forEach(path => {
+    if (path.getAttribute('class') === 'active') {
+      path.setAttribute('style', 'fill: #5C8374; filter: drop-shadow(2px 2px 6px rgba(0, 0, 0, 0.5));');
+    }
+  })
+}
+
 function clearHeatMap() {
   document.querySelectorAll('#paths-container > path').forEach(path => {
     if (path.getAttribute('class') !== 'active') {
       path.removeAttribute('style');
     }
-  });
+  })
 }
 
 function crimeVisualizer(crimeData) {
