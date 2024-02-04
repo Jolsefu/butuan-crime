@@ -524,6 +524,7 @@ function DataVisualizer(props) {
 
   useEffect(() => {
     hardClearHeatMap();
+    clearHeatMap();
   }, [props.dataType])
 
   // Display a data visualizer for barangay data
