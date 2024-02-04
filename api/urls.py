@@ -10,6 +10,7 @@ urlpatterns = [
     path("barangay/<str:barangay_name>", views.barangay, name="barangay"),
     # Return a JSON of 
     path("crime/<str:crime_name>", views.crime, name="crime"),
+    path("yearly_crime/<str:crime_name>", views.yearly_crime, name="yearly_crime"),
     path("barangay_crime/<str:barangay_name>/<str:crime_name>", views.barangay_crime, name="barangay_crime")
 ]
 
@@ -55,6 +56,15 @@ Routes and their JSON information;
     "ambago": 3,
     "amparo": 1,
     ...
+}
+
+/yearly_crime/<str:crime_name
+
+{
+    2023: {
+        "ampayon": 1,
+        ...
+    }
 }
 
 

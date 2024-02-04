@@ -80,6 +80,54 @@ def barangay(request, barangay_name):
     # Return a JSON response
     return JsonResponse(data, safe=False, status=200)
 
+def yearly_crime(request, crime_name):
+    """
+    API that returns what barangay the chosen crime has
+    occurred and its count inside that barangay per year
+    """
+
+    # Verify if the crime exists
+    occurrences = Crime.objects.filter(name__icontains=crime_name)
+
+    if not occurrences:
+        return JsonResponse({"error": "Invalid crime name"}, status=404)
+
+    # Get the list of the barangays from where that crime happened
+    data = {}
+
+    # The total of crime occurrences
+    data["yearly"] = {}
+
+    data["yearly_totals"] = {}
+
+    data["crime"] = crime_name
+
+    # Iterate over all the occurrences
+    for occurrence in occurrences.values("barangay", "datetime"):
+        # Get the barangay and its name
+        barangay = Barangay.objects.filter(pk=occurrence["barangay"]).values("name")
+        barangay = barangay[0]["name"]
+
+        # Get datetime of current crime occurrence
+        current_year = occurrence["datetime"].year
+        current_year = current_year
+
+        if current_year not in data["yearly_totals"]:
+            data["yearly_totals"][current_year] = 1
+        else:
+            data["yearly_totals"][current_year] += 1
+
+        if current_year not in data["yearly"]:
+            data["yearly"][current_year] = {}
+
+        if barangay not in data["yearly"][current_year]:
+            data["yearly"][current_year][barangay] = 1
+        else:
+            data["yearly"][current_year][barangay] += 1
+
+    # return a JSON response
+    return JsonResponse(data, safe=False)
+
 def crime(request, crime_name):
     """
     API that returns what barangay the chosen crime has

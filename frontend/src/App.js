@@ -227,8 +227,6 @@ export default function App() {
     if (Object.keys(crimeData).length) {
       setDataType('crime');
     }
-
-    crimeVisualizer(crimeData);
   }, [crimeData]);
 
   /**
@@ -607,6 +605,19 @@ function DataVisualizer(props) {
       setCYear(year);
       // Set the current max of Y axis for the graph
       setCMax(props.crimeData['yearly_totals'][year]);
+
+      axios
+      .get(`${backend_url}/yearly_crime/${props.crime}`)
+      .then(response => {
+        const crimeData = response.data.yearly[year]
+        crimeData.yearly_totals = response.data.yearly_totals
+        crimeData.crime = response.data.crime
+
+        crimeVisualizer(crimeData);
+      })
+      .catch(error => {
+        console.log(error);
+      })
 
       // Set the currentMonths and currentHours dictionary for the chart
       let currentMonths = {};
